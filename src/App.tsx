@@ -12,6 +12,7 @@ function App() {
     currentDiagram,
     createDiagram,
     updateDiagram,
+    renameDiagram,
     deleteDiagram,
     selectDiagram,
   } = useDiagrams();
@@ -31,6 +32,10 @@ function App() {
 
   const handleCreateDiagram = (name: string) => {
     createDiagram(name);
+  };
+
+  const handleRenameDiagram = (id: string, newName: string) => {
+    renameDiagram(id, newName);
   };
 
   const handleExport = (format: 'mermaid' | 'bpmn') => {
@@ -74,6 +79,7 @@ function App() {
         onCreateDiagram={handleCreateDiagram}
         onSelectDiagram={selectDiagram}
         onDeleteDiagram={deleteDiagram}
+        onRenameDiagram={handleRenameDiagram}
       />
       
       <div className="flex-1 flex flex-col">

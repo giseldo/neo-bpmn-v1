@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, FileText, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Plus, FileText, Trash2, ChevronLeft, ChevronRight, Edit2, Check, X } from 'lucide-react';
 import { BPMNDiagram } from '../types/bpmn';
 
 interface SidebarProps {
@@ -8,6 +8,7 @@ interface SidebarProps {
   onCreateDiagram: (name: string) => void;
   onSelectDiagram: (diagram: BPMNDiagram) => void;
   onDeleteDiagram: (id: string) => void;
+  onRenameDiagram: (id: string, newName: string) => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -16,10 +17,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onCreateDiagram,
   onSelectDiagram,
   onDeleteDiagram,
+  onRenameDiagram,
 }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [showNewDiagramInput, setShowNewDiagramInput] = useState(false);
   const [newDiagramName, setNewDiagramName] = useState('');
+  const [renamingDiagramId, setRenamingDiagramId] = useState<string | null>(null);
+  const [renameValue, setRenameValue] = useState('');
 
   const handleCreateDiagram = () => {
     if (newDiagramName.trim()) {
@@ -35,6 +39,33 @@ export const Sidebar: React.FC<SidebarProps> = ({
     } else if (e.key === 'Escape') {
       setShowNewDiagramInput(false);
       setNewDiagramName('');
+    }
+  };
+
+  const startRename = (diagram: BPMNDiagram, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setRenamingDiagramId(diagram.id);
+    setRenameValue(diagram.name);
+  };
+
+  const handleRename = () => {
+    if (renamingDiagramId && renameValue.trim()) {
+      onRenameDiagram(renamingDiagramId, renameValue.trim());
+    }
+    setRenamingDiagramId(null);
+    setRenameValue('');
+  };
+
+  const cancelRename = () => {
+    setRenamingDiagramId(null);
+    setRenameValue('');
+  };
+
+  const handleRenameKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleRename();
+    } else if (e.key === 'Escape') {
+      cancelRename();
     }
   };
 
@@ -116,31 +147,82 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   ? 'bg-blue-100 border border-blue-200'
                   : 'hover:bg-gray-100'
               }`}
-              onClick={() => onSelectDiagram(diagram)}
+              onClick={() => !renamingDiagramId && onSelectDiagram(diagram)}
             >
               <div className="flex items-start gap-3">
                 <FileText size={18} className="text-blue-600 mt-0.5 flex-shrink-0" />
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-medium text-gray-900 truncate">
-                    {diagram.name}
-                  </h3>
-                  <p className="text-sm text-gray-500 mt-1">
-                    {diagram.elements.length} elements
-                  </p>
-                  <p className="text-xs text-gray-400 mt-1">
-                    {diagram.updatedAt.toLocaleDateString()}
-                  </p>
+                  {renamingDiagramId === diagram.id ? (
+                    <div className="space-y-2">
+                      <input
+                        type="text"
+                        value={renameValue}
+                        onChange={(e) => setRenameValue(e.target.value)}
+                        onKeyDown={handleRenameKeyPress}
+                        className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        autoFocus
+                        onClick={(e) => e.stopPropagation()}
+                      />
+                      <div className="flex gap-1">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleRename();
+                          }}
+                          className="p-1 text-green-600 hover:bg-green-100 rounded transition-colors"
+                          title="Save"
+                        >
+                          <Check size={14} />
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            cancelRename();
+                          }}
+                          className="p-1 text-gray-600 hover:bg-gray-100 rounded transition-colors"
+                          title="Cancel"
+                        >
+                          <X size={14} />
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <h3 className="font-medium text-gray-900 truncate">
+                        {diagram.name}
+                      </h3>
+                      <p className="text-sm text-gray-500 mt-1">
+                        {diagram.elements.length} elements
+                      </p>
+                      <p className="text-xs text-gray-400 mt-1">
+                        {diagram.updatedAt.toLocaleDateString()}
+                      </p>
+                    </>
+                  )}
                 </div>
               </div>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onDeleteDiagram(diagram.id);
-                }}
-                className="absolute top-2 right-2 p-1 text-gray-400 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity"
-              >
-                <Trash2 size={14} />
-              </button>
+              
+              {renamingDiagramId !== diagram.id && (
+                <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <button
+                    onClick={(e) => startRename(diagram, e)}
+                    className="p-1 text-gray-400 hover:text-blue-600 transition-colors"
+                    title="Rename diagram"
+                  >
+                    <Edit2 size={14} />
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onDeleteDiagram(diagram.id);
+                    }}
+                    className="p-1 text-gray-400 hover:text-red-600 transition-colors"
+                    title="Delete diagram"
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                </div>
+              )}
             </div>
           ))}
         </div>

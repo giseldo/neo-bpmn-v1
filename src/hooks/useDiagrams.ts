@@ -56,6 +56,18 @@ export const useDiagrams = () => {
     setCurrentDiagram(updatedDiagram);
   };
 
+  const renameDiagram = (id: string, newName: string) => {
+    const updatedDiagrams = diagrams.map(d => 
+      d.id === id ? { ...d, name: newName, updatedAt: new Date() } : d
+    );
+    saveDiagrams(updatedDiagrams);
+    
+    // Update current diagram if it's the one being renamed
+    if (currentDiagram?.id === id) {
+      setCurrentDiagram({ ...currentDiagram, name: newName, updatedAt: new Date() });
+    }
+  };
+
   const deleteDiagram = (id: string) => {
     const updatedDiagrams = diagrams.filter(d => d.id !== id);
     saveDiagrams(updatedDiagrams);
@@ -74,6 +86,7 @@ export const useDiagrams = () => {
     currentDiagram,
     createDiagram,
     updateDiagram,
+    renameDiagram,
     deleteDiagram,
     selectDiagram,
   };

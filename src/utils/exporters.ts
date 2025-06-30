@@ -11,7 +11,8 @@ export const exportToMermaid = (diagram: BPMNDiagram): string => {
 
   // Add connections
   diagram.connections.forEach(connection => {
-    mermaid += `    ${connection.source} --> ${connection.target}\n`;
+    const label = connection.label ? `|${connection.label}|` : '';
+    mermaid += `    ${connection.source} -->${label} ${connection.target}\n`;
   });
 
   // Add styling
@@ -98,7 +99,8 @@ const getBPMNElement = (element: any) => {
 };
 
 const getBPMNSequenceFlow = (connection: any) => {
-  return `    <sequenceFlow id="${connection.id}" sourceRef="${connection.source}" targetRef="${connection.target}" />`;
+  const name = connection.label ? ` name="${connection.label}"` : '';
+  return `    <sequenceFlow id="${connection.id}" sourceRef="${connection.source}" targetRef="${connection.target}"${name} />`;
 };
 
 const getBPMNShape = (element: any) => {
@@ -108,6 +110,9 @@ const getBPMNShape = (element: any) => {
   
   return `      <bpmndi:BPMNShape id="${element.id}_di" bpmnElement="${element.id}">
         <dc:Bounds x="${x}" y="${y}" width="${width}" height="${height}" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="${x}" y="${y + height + 5}" width="${width}" height="14" />
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>`;
 };
 
@@ -117,8 +122,14 @@ const getBPMNEdge = (connection: any, elements: any[]) => {
   
   if (!source || !target) return '';
   
+  const sourceSize = source.type === 'task' ? 100 : source.type === 'gateway' ? 80 : 60;
+  const targetSize = target.type === 'task' ? 100 : target.type === 'gateway' ? 80 : 60;
+  
   return `      <bpmndi:BPMNEdge id="${connection.id}_di" bpmnElement="${connection.id}">
-        <di:waypoint x="${source.position.x + 50}" y="${source.position.y + 30}" />
-        <di:waypoint x="${target.position.x + 50}" y="${target.position.y + 30}" />
+        <di:waypoint x="${source.position.x + sourceSize / 2}" y="${source.position.y + sourceSize / 2}" />
+        <di:waypoint x="${target.position.x + targetSize / 2}" y="${target.position.y + targetSize / 2}" />
+        ${connection.label ? `<bpmndi:BPMNLabel>
+          <dc:Bounds x="${(source.position.x + target.position.x) / 2 - 15}" y="${(source.position.y + target.position.y) / 2 - 7}" width="30" height="14" />
+        </bpmndi:BPMNLabel>` : ''}
       </bpmndi:BPMNEdge>`;
 };

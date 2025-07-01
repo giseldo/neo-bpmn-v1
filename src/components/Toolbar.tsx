@@ -1,9 +1,9 @@
 import React from 'react';
-import { Circle, Square, Diamond, CircleDot, Download, Save } from 'lucide-react';
+import { Circle, Square, Diamond, CircleDot, Download, Save, Layers } from 'lucide-react';
 import { BPMNElement } from '../types/bpmn';
 
 interface ToolbarProps {
-  onDragStart: (elementType: BPMNElement['type'], event: React.DragEvent) => void;
+  onDragStart: (elementType: BPMNElement['type'] | 'pool', event: React.DragEvent) => void;
   onExport: (format: 'mermaid' | 'bpmn') => void;
   onSave: () => void;
 }
@@ -14,6 +14,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({ onDragStart, onExport, onSave 
     { type: 'task' as const, icon: Square, label: 'Task', color: 'text-blue-600' },
     { type: 'gateway' as const, icon: Diamond, label: 'Gateway', color: 'text-yellow-600' },
     { type: 'end' as const, icon: CircleDot, label: 'End Event', color: 'text-red-600' },
+    { type: 'pool' as const, icon: Layers, label: 'Pool', color: 'text-purple-600' },
   ];
 
   return (

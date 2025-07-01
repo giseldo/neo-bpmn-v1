@@ -15,6 +15,7 @@ export const useDiagrams = () => {
           ...d,
           createdAt: new Date(d.createdAt),
           updatedAt: new Date(d.updatedAt),
+          pools: d.pools || [], // Ensure pools array exists
         }));
         setDiagrams(parsedDiagrams);
         if (parsedDiagrams.length > 0) {
@@ -37,6 +38,7 @@ export const useDiagrams = () => {
       name,
       elements: [],
       connections: [],
+      pools: [],
       createdAt: new Date(),
       updatedAt: new Date(),
     };

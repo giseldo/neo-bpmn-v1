@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, FileText, Trash2, ChevronLeft, ChevronRight, Edit2, Check, X } from 'lucide-react';
+import { Plus, FileText, Trash2, ChevronLeft, ChevronRight, Edit2, Check, X, Info, HelpCircle } from 'lucide-react';
 import { BPMNDiagram } from '../types/bpmn';
 
 interface SidebarProps {
@@ -9,6 +9,8 @@ interface SidebarProps {
   onSelectDiagram: (diagram: BPMNDiagram) => void;
   onDeleteDiagram: (id: string) => void;
   onRenameDiagram: (id: string, newName: string) => void;
+  onShowAbout: () => void;
+  onShowHelp: () => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -18,6 +20,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onSelectDiagram,
   onDeleteDiagram,
   onRenameDiagram,
+  onShowAbout,
+  onShowHelp,
 }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [showNewDiagramInput, setShowNewDiagramInput] = useState(false);
@@ -87,12 +91,28 @@ export const Sidebar: React.FC<SidebarProps> = ({
       <div className="p-4 border-b border-gray-200">
         <div className="flex items-center justify-between">
           <h1 className="text-xl font-semibold text-gray-900">BPMN Designer</h1>
-          <button
-            onClick={() => setIsCollapsed(true)}
-            className="p-1 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
-          >
-            <ChevronLeft size={20} />
-          </button>
+          <div className="flex items-center gap-1">
+            <button
+              onClick={onShowHelp}
+              className="p-1 text-gray-500 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+              title="Ajuda"
+            >
+              <HelpCircle size={20} />
+            </button>
+            <button
+              onClick={onShowAbout}
+              className="p-1 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+              title="Sobre"
+            >
+              <Info size={20} />
+            </button>
+            <button
+              onClick={() => setIsCollapsed(true)}
+              className="p-1 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+            >
+              <ChevronLeft size={20} />
+            </button>
+          </div>
         </div>
       </div>
 

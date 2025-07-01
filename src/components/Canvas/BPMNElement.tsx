@@ -40,6 +40,7 @@ export const BPMNElement: React.FC<BPMNElementProps> = ({
           color: 'text-green-600 border-green-600',
           bgColor: 'bg-green-50',
           size: 60,
+          isRound: true,
         };
       case 'task':
         return {
@@ -47,6 +48,7 @@ export const BPMNElement: React.FC<BPMNElementProps> = ({
           color: 'text-blue-600 border-blue-600',
           bgColor: 'bg-blue-50',
           size: 100,
+          isRound: false,
         };
       case 'gateway':
         return {
@@ -54,6 +56,7 @@ export const BPMNElement: React.FC<BPMNElementProps> = ({
           color: 'text-yellow-600 border-yellow-600',
           bgColor: 'bg-yellow-50',
           size: 80,
+          isRound: false,
         };
       case 'end':
         return {
@@ -61,12 +64,13 @@ export const BPMNElement: React.FC<BPMNElementProps> = ({
           color: 'text-red-600 border-red-600',
           bgColor: 'bg-red-50',
           size: 60,
+          isRound: true,
         };
     }
   };
 
   const config = getElementConfig();
-  const { Icon, color, bgColor, size } = config;
+  const { Icon, color, bgColor, size, isRound } = config;
 
   const handleDoubleClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -150,6 +154,17 @@ export const BPMNElement: React.FC<BPMNElementProps> = ({
     }
   };
 
+  // Get border radius classes based on element type
+  const getBorderRadiusClass = () => {
+    if (isRound) {
+      return 'rounded-full';
+    } else if (element.type === 'gateway') {
+      return 'rounded-lg';
+    } else {
+      return 'rounded-lg';
+    }
+  };
+
   return (
     <div
       className={`absolute select-none group ${isDragging ? 'z-10' : 'z-0'} ${
@@ -168,11 +183,10 @@ export const BPMNElement: React.FC<BPMNElementProps> = ({
     >
       <div
         className={`
-          w-full h-full ${bgColor} border-2 ${color} rounded-lg
+          w-full h-full ${bgColor} border-2 ${color} ${getBorderRadiusClass()}
           flex items-center justify-center transition-all duration-200
           ${isSelected ? 'ring-2 ring-blue-400 ring-offset-2' : ''}
           ${!isEditing ? 'hover:shadow-md group-hover:scale-105' : ''}
-          ${element.type === 'start' || element.type === 'end' ? 'rounded-full' : ''}
           ${element.type === 'gateway' ? 'transform rotate-45' : ''}
         `}
       >

@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { BPMNDiagram, BPMNElement as BPMNElementType, BPMNConnection, DraggedElement } from '../../types/bpmn';
+import { BPMNDiagram, BPMNElement as BPMNElementType, BPMNConnection, BPMNPool, BPMNLane, DraggedElement } from '../../types/bpmn';
 import { BPMNElement } from './BPMNElement';
 import { ConnectionLine } from './ConnectionLine';
+import { Pool } from './Pool';
 
 interface CanvasProps {
   diagram: BPMNDiagram;
@@ -12,6 +13,7 @@ interface CanvasProps {
 export const Canvas: React.FC<CanvasProps> = ({ diagram, onUpdateDiagram, draggedElement }) => {
   const [selectedElementId, setSelectedElementId] = useState<string | null>(null);
   const [selectedConnectionId, setSelectedConnectionId] = useState<string | null>(null);
+  const [selectedPoolId, setSelectedPoolId] = useState<string | null>(null);
   const [isConnecting, setIsConnecting] = useState(false);
   const [connectionStart, setConnectionStart] = useState<{ elementId: string; position: { x: number; y: number } } | null>(null);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -27,19 +29,63 @@ export const Canvas: React.FC<CanvasProps> = ({ diagram, onUpdateDiagram, dragge
       y: e.clientY - rect.top - draggedElement.offset.y,
     };
 
-    const newElement: BPMNElementType = {
-      id: crypto.randomUUID(),
-      type: draggedElement.type,
-      position,
-      label: `${draggedElement.type.charAt(0).toUpperCase() + draggedElement.type.slice(1)} ${diagram.elements.length + 1}`,
-    };
+    if (draggedElement.type === 'pool') {
+      const newPool: BPMNPool = {
+        id: crypto.randomUUID(),
+        name: `Pool ${diagram.pools.length + 1}`,
+        position,
+        size: { width: 400, height: 200 },
+        color: '#3B82F6',
+        lanes: [
+          {
+            id: crypto.randomUUID(),
+            name: 'Lane 1',
+            poolId: '',
+            position: { x: 0, y: 0 },
+            size: { width: 400, height: 200 },
+          }
+        ],
+      };
+      
+      // Update lane poolId
+      newPool.lanes![0].poolId = newPool.id;
 
-    const updatedDiagram = {
-      ...diagram,
-      elements: [...diagram.elements, newElement],
-    };
+      const updatedDiagram = {
+        ...diagram,
+        pools: [...diagram.pools, newPool],
+      };
 
-    onUpdateDiagram(updatedDiagram);
+      onUpdateDiagram(updatedDiagram);
+    } else {
+      // Check if dropped inside a pool
+      let poolId: string | undefined;
+      for (const pool of diagram.pools) {
+        if (
+          position.x >= pool.position.x &&
+          position.x <= pool.position.x + pool.size.width &&
+          position.y >= pool.position.y &&
+          position.y <= pool.position.y + pool.size.height
+        ) {
+          poolId = pool.id;
+          break;
+        }
+      }
+
+      const newElement: BPMNElementType = {
+        id: crypto.randomUUID(),
+        type: draggedElement.type as BPMNElementType['type'],
+        position,
+        label: `${draggedElement.type.charAt(0).toUpperCase() + draggedElement.type.slice(1)} ${diagram.elements.length + 1}`,
+        poolId,
+      };
+
+      const updatedDiagram = {
+        ...diagram,
+        elements: [...diagram.elements, newElement],
+      };
+
+      onUpdateDiagram(updatedDiagram);
+    }
   };
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -47,12 +93,120 @@ export const Canvas: React.FC<CanvasProps> = ({ diagram, onUpdateDiagram, dragge
   };
 
   const handleElementMove = (id: string, position: { x: number; y: number }) => {
-    if (isConnecting) return; // Don't move elements while connecting
+    if (isConnecting) return;
+    
+    // Check if element is being moved into a different pool
+    let poolId: string | undefined;
+    for (const pool of diagram.pools) {
+      if (
+        position.x >= pool.position.x &&
+        position.x <= pool.position.x + pool.size.width &&
+        position.y >= pool.position.y &&
+        position.y <= pool.position.y + pool.size.height
+      ) {
+        poolId = pool.id;
+        break;
+      }
+    }
     
     const updatedDiagram = {
       ...diagram,
       elements: diagram.elements.map(el =>
-        el.id === id ? { ...el, position } : el
+        el.id === id ? { ...el, position, poolId } : el
+      ),
+    };
+    onUpdateDiagram(updatedDiagram);
+  };
+
+  const handlePoolMove = (id: string, position: { x: number; y: number }) => {
+    const updatedDiagram = {
+      ...diagram,
+      pools: diagram.pools.map(pool =>
+        pool.id === id ? { ...pool, position } : pool
+      ),
+    };
+    onUpdateDiagram(updatedDiagram);
+  };
+
+  const handlePoolResize = (id: string, size: { width: number; height: number }) => {
+    const updatedDiagram = {
+      ...diagram,
+      pools: diagram.pools.map(pool =>
+        pool.id === id ? { ...pool, size } : pool
+      ),
+    };
+    onUpdateDiagram(updatedDiagram);
+  };
+
+  const handlePoolDelete = (id: string) => {
+    const updatedDiagram = {
+      ...diagram,
+      pools: diagram.pools.filter(pool => pool.id !== id),
+      elements: diagram.elements.map(el => 
+        el.poolId === id ? { ...el, poolId: undefined } : el
+      ),
+    };
+    onUpdateDiagram(updatedDiagram);
+    setSelectedPoolId(null);
+  };
+
+  const handlePoolUpdateName = (id: string, name: string) => {
+    const updatedDiagram = {
+      ...diagram,
+      pools: diagram.pools.map(pool =>
+        pool.id === id ? { ...pool, name } : pool
+      ),
+    };
+    onUpdateDiagram(updatedDiagram);
+  };
+
+  const handleAddLane = (poolId: string) => {
+    const pool = diagram.pools.find(p => p.id === poolId);
+    if (!pool) return;
+
+    const newLane: BPMNLane = {
+      id: crypto.randomUUID(),
+      name: `Lane ${(pool.lanes?.length || 0) + 1}`,
+      poolId,
+      position: { x: 0, y: 0 },
+      size: { width: pool.size.width, height: pool.size.height / ((pool.lanes?.length || 0) + 1) },
+    };
+
+    const updatedDiagram = {
+      ...diagram,
+      pools: diagram.pools.map(p =>
+        p.id === poolId 
+          ? { ...p, lanes: [...(p.lanes || []), newLane] }
+          : p
+      ),
+    };
+    onUpdateDiagram(updatedDiagram);
+  };
+
+  const handleDeleteLane = (poolId: string, laneId: string) => {
+    const updatedDiagram = {
+      ...diagram,
+      pools: diagram.pools.map(pool =>
+        pool.id === poolId 
+          ? { ...pool, lanes: pool.lanes?.filter(lane => lane.id !== laneId) || [] }
+          : pool
+      ),
+    };
+    onUpdateDiagram(updatedDiagram);
+  };
+
+  const handleUpdateLane = (poolId: string, laneId: string, name: string) => {
+    const updatedDiagram = {
+      ...diagram,
+      pools: diagram.pools.map(pool =>
+        pool.id === poolId 
+          ? { 
+              ...pool, 
+              lanes: pool.lanes?.map(lane => 
+                lane.id === laneId ? { ...lane, name } : lane
+              ) || []
+            }
+          : pool
       ),
     };
     onUpdateDiagram(updatedDiagram);
@@ -85,11 +239,11 @@ export const Canvas: React.FC<CanvasProps> = ({ diagram, onUpdateDiagram, dragge
     setConnectionStart({ elementId, position });
     setSelectedElementId(null);
     setSelectedConnectionId(null);
+    setSelectedPoolId(null);
   };
 
   const handleConnectionEnd = (targetElementId: string) => {
     if (connectionStart && connectionStart.elementId !== targetElementId) {
-      // Check if connection already exists
       const existingConnection = diagram.connections.find(
         conn => conn.source === connectionStart.elementId && conn.target === targetElementId
       );
@@ -127,6 +281,7 @@ export const Canvas: React.FC<CanvasProps> = ({ diagram, onUpdateDiagram, dragge
     if (e.target === e.currentTarget) {
       setSelectedElementId(null);
       setSelectedConnectionId(null);
+      setSelectedPoolId(null);
       if (isConnecting) {
         setIsConnecting(false);
         setConnectionStart(null);
@@ -157,8 +312,27 @@ export const Canvas: React.FC<CanvasProps> = ({ diagram, onUpdateDiagram, dragge
         onClick={handleCanvasClick}
         onMouseMove={handleMouseMove}
       >
+        {/* Pools (rendered first, behind elements) */}
+        <div style={{ zIndex: 1 }} className="relative">
+          {diagram.pools.map((pool) => (
+            <Pool
+              key={pool.id}
+              pool={pool}
+              isSelected={selectedPoolId === pool.id}
+              onSelect={setSelectedPoolId}
+              onMove={handlePoolMove}
+              onResize={handlePoolResize}
+              onDelete={handlePoolDelete}
+              onUpdateName={handlePoolUpdateName}
+              onAddLane={handleAddLane}
+              onDeleteLane={handleDeleteLane}
+              onUpdateLane={handleUpdateLane}
+            />
+          ))}
+        </div>
+
         {/* SVG for connections */}
-        <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 1 }}>
+        <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 10 }}>
           <defs>
             <marker
               id="arrowhead"
@@ -188,7 +362,6 @@ export const Canvas: React.FC<CanvasProps> = ({ diagram, onUpdateDiagram, dragge
             </marker>
           </defs>
           
-          {/* Render connections */}
           {diagram.connections.map((connection) => {
             const sourceElement = diagram.elements.find(el => el.id === connection.source);
             const targetElement = diagram.elements.find(el => el.id === connection.target);
@@ -208,7 +381,6 @@ export const Canvas: React.FC<CanvasProps> = ({ diagram, onUpdateDiagram, dragge
             );
           })}
 
-          {/* Temporary connection line while connecting */}
           {isConnecting && connectionStart && (
             <line
               x1={connectionStart.position.x}
@@ -223,8 +395,8 @@ export const Canvas: React.FC<CanvasProps> = ({ diagram, onUpdateDiagram, dragge
           )}
         </svg>
 
-        {/* Elements */}
-        <div style={{ zIndex: 2 }} className="relative">
+        {/* Elements (rendered on top of pools) */}
+        <div style={{ zIndex: 15 }} className="relative">
           {diagram.elements.map((element) => (
             <BPMNElement
               key={element.id}
@@ -242,7 +414,7 @@ export const Canvas: React.FC<CanvasProps> = ({ diagram, onUpdateDiagram, dragge
         </div>
 
         {/* Empty state */}
-        {diagram.elements.length === 0 && (
+        {diagram.elements.length === 0 && diagram.pools.length === 0 && (
           <div className="absolute inset-0 flex items-center justify-center" style={{ zIndex: 0 }}>
             <div className="text-center">
               <div className="text-gray-400 text-lg mb-2">Empty Canvas</div>
@@ -250,7 +422,7 @@ export const Canvas: React.FC<CanvasProps> = ({ diagram, onUpdateDiagram, dragge
                 Drag elements from the toolbar to start creating your BPMN diagram
               </div>
               <div className="text-gray-400 text-xs mt-2">
-                Hover over elements and use the blue dots to create connections
+                Use pools to organize elements by participants or departments
               </div>
               <div className="text-gray-400 text-xs mt-1">
                 Double-click on elements to rename them

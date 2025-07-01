@@ -19,7 +19,7 @@
     "gateway": "Gateway",
     "pool": "Pool",
     "export": "Export",
-    "save": "Save",
+    "import": "Import",
     "mermaid": "Mermaid",
     "bpmn": "BPMN XML"
   },

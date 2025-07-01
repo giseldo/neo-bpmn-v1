@@ -9,7 +9,7 @@ import { HelpPage } from './components/Help/HelpPage';
 import { useDiagrams } from './hooks/useDiagrams';
 import { useChat } from './hooks/useChat';
 import { DraggedElement, BPMNElement } from './types/bpmn';
-import { exportToMermaid, exportToBPMN } from './utils/exporters';
+import { exportToMermaid, exportToBPMN, importFromMermaid } from './utils/exporters';
 import { applyModifications } from './utils/diagramModifier';
 
 function App() {
@@ -76,9 +76,31 @@ function App() {
     URL.revokeObjectURL(url);
   };
 
-  const handleSave = () => {
-    if (currentDiagram) {
-      updateDiagram(currentDiagram);
+  const handleImport = (content: string) => {
+    if (!currentDiagram) return;
+
+    try {
+      const importedData = importFromMermaid(content);
+      
+      if (!importedData.elements || importedData.elements.length === 0) {
+        alert('Nenhum elemento foi encontrado no arquivo Mermaid. Verifique o formato.');
+        return;
+      }
+      
+      const updatedDiagram = {
+        ...currentDiagram,
+        elements: importedData.elements || [],
+        connections: importedData.connections || [],
+        pools: importedData.pools || [],
+        updatedAt: new Date()
+      };
+      
+      updateDiagram(updatedDiagram);
+      alert(`Diagrama importado com sucesso! ${importedData.elements.length} elementos e ${importedData.connections?.length || 0} conexões.`);
+    } catch (error) {
+      console.error('Error importing diagram:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
+      alert(`Erro ao importar diagrama: ${errorMessage}\n\nVerifique se o formato Mermaid está correto.`);
     }
   };
 
@@ -123,7 +145,7 @@ function App() {
         <Toolbar
           onDragStart={handleDragStart}
           onExport={handleExport}
-          onSave={handleSave}
+          onImport={handleImport}
         />
         
         {currentDiagram ? (

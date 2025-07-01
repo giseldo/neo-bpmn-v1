@@ -1,16 +1,17 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Circle, Square, Diamond, Download, Save, Layers } from 'lucide-react';
+import { Circle, Square, Diamond, Download, Upload, Layers } from 'lucide-react';
 import { BPMNElement } from '../types/bpmn';
 
 interface ToolbarProps {
   onDragStart: (elementType: BPMNElement['type'] | 'pool', event: React.DragEvent) => void;
   onExport: (format: 'mermaid' | 'bpmn') => void;
-  onSave: () => void;
+  onImport: (content: string) => void;
 }
 
-export const Toolbar: React.FC<ToolbarProps> = ({ onDragStart, onExport, onSave }) => {
+export const Toolbar: React.FC<ToolbarProps> = ({ onDragStart, onExport, onImport }) => {
   const { t } = useTranslation();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
   const elements = [
     { type: 'start' as const, icon: Circle, label: t('toolbar.startEvent'), color: 'text-green-600' },
@@ -19,6 +20,26 @@ export const Toolbar: React.FC<ToolbarProps> = ({ onDragStart, onExport, onSave 
     { type: 'end' as const, icon: Circle, label: t('toolbar.endEvent'), color: 'text-red-600' },
     { type: 'pool' as const, icon: Layers, label: t('toolbar.pool'), color: 'text-purple-600' },
   ];
+
+  const handleImportClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const content = e.target?.result as string;
+        onImport(content);
+      };
+      reader.readAsText(file);
+    }
+    // Reset the input so the same file can be selected again
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
 
   return (
     <div className="bg-white border-b border-gray-200 px-4 py-3">
@@ -43,12 +64,21 @@ export const Toolbar: React.FC<ToolbarProps> = ({ onDragStart, onExport, onSave 
         
         <div className="flex items-center gap-2">
           <button
-            onClick={onSave}
+            onClick={handleImportClick}
             className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
           >
-            <Save size={16} />
-            {t('toolbar.save')}
+            <Upload size={16} />
+            {t('toolbar.import')}
           </button>
+          
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".mmd,.txt"
+            onChange={handleFileChange}
+            className="hidden"
+          />
+          
           <div className="relative group">
             <button className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
               <Download size={16} />

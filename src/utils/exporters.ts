@@ -133,3 +133,112 @@ const getBPMNEdge = (connection: any, elements: any[]) => {
         </bpmndi:BPMNLabel>` : ''}
       </bpmndi:BPMNEdge>`;
 };
+
+export const importFromMermaid = (mermaidContent: string): Partial<BPMNDiagram> => {
+  const lines = mermaidContent.split('\n').map(line => line.trim()).filter(line => line);
+  
+  if (lines.length === 0) {
+    throw new Error('O arquivo está vazio.');
+  }
+  
+  if (!lines[0] || !lines[0].startsWith('flowchart')) {
+    throw new Error('Formato Mermaid inválido. Esperado sintaxe "flowchart TD" ou similar.');
+  }
+
+  const elements: any[] = [];
+  const connections: any[] = [];
+  let elementCounter = 0;
+  
+  // Parse elements and connections
+  for (const line of lines.slice(1)) {
+    // Skip empty lines and class definitions
+    if (!line || line.startsWith('classDef') || line.startsWith('class')) {
+      continue;
+    }
+
+    // Parse connections (arrows) - support different arrow types
+    if (line.includes('-->') || line.includes('-.->') || line.includes('==>')) {
+      // Match different arrow patterns
+      const arrowPattern = /(\w+)\s*(?:-->|-.->|==>)\s*(?:\|([^|]+)\|)?\s*(\w+)/;
+      const match = line.match(arrowPattern);
+      if (match) {
+        const [, source, label, target] = match;
+        connections.push({
+          id: `connection-${source}-${target}`,
+          source: source.trim(),
+          target: target.trim(),
+          label: label?.trim() || undefined
+        });
+      }
+      continue;
+    }
+
+    // Parse elements (nodes) - improved regex to handle different bracket types
+    const elementMatch = line.match(/(\w+)(\(\(\(.*?\)\)\)|\(\(.*?\)\)|\[.*?\]|\{.*?\}|<.*?>)"([^"]*)"/);
+    if (elementMatch) {
+      const [, id, shape, label] = elementMatch;
+      const type = getElementTypeFromShape(shape);
+      
+      // Check if element already exists
+      if (!elements.find(el => el.id === id.trim())) {
+        elements.push({
+          id: id.trim(),
+          type,
+          label: label.trim(),
+          position: { 
+            x: 100 + (elementCounter % 4) * 200, 
+            y: 100 + Math.floor(elementCounter / 4) * 150 
+          },
+          properties: {}
+        });
+        elementCounter++;
+      }
+    }
+  }
+
+  // Create elements for any connection endpoints that weren't defined as nodes
+  const allNodeIds = new Set(elements.map(el => el.id));
+  const connectionNodeIds = new Set([
+    ...connections.map(conn => conn.source),
+    ...connections.map(conn => conn.target)
+  ]);
+
+  connectionNodeIds.forEach(nodeId => {
+    if (!allNodeIds.has(nodeId)) {
+      elements.push({
+        id: nodeId,
+        type: 'task', // default type
+        label: nodeId,
+        position: { 
+          x: 100 + (elementCounter % 4) * 200, 
+          y: 100 + Math.floor(elementCounter / 4) * 150 
+        },
+        properties: {}
+      });
+      elementCounter++;
+    }
+  });
+
+  if (elements.length === 0) {
+    throw new Error('Nenhum elemento válido encontrado no arquivo Mermaid. Verifique a sintaxe.');
+  }
+
+  return {
+    elements,
+    connections,
+    pools: []
+  };
+};
+
+const getElementTypeFromShape = (shape: string): string => {
+  if (shape.startsWith('((') && shape.endsWith('))')) {
+    return 'start';
+  } else if (shape.startsWith('(((') && shape.endsWith(')))')) {
+    return 'end';
+  } else if (shape.startsWith('{') && shape.endsWith('}')) {
+    return 'gateway';
+  } else if (shape.startsWith('[') && shape.endsWith(']')) {
+    return 'task';
+  }
+  return 'task'; // default
+};

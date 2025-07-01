@@ -1,0 +1,14 @@
+flowchart TD
+    A(("Start Event"))
+    B["Task 1: Collect Data"]
+    C{"Decision Gateway"}
+    D["Task 2: Process Valid Data"]
+    E["Task 3: Handle Invalid Data"]
+    F(((End Event)))
+    
+    A --> B
+    B --> C
+    C -->|Valid| D
+    C -->|Invalid| E
+    D --> F
+    E --> F

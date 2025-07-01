@@ -1,0 +1,25 @@
+flowchart TD
+    start(("Início"))
+    task1["Verificar Dados"]
+    gateway{"Dados Válidos?"}
+    task2["Processar Dados"]
+    task3["Reportar Erro"]
+    end1((("Finalizar")))
+    
+    start --> task1
+    task1 --> gateway
+    gateway -->|Sim| task2
+    gateway -->|Não| task3
+    task2 --> end1
+    task3 --> end1
+    
+    classDef startClass fill:#d1fae5,stroke:#10b981,stroke-width:2px
+    class start startClass
+    classDef taskClass fill:#dbeafe,stroke:#3b82f6,stroke-width:2px
+    class task1 taskClass
+    class task2 taskClass
+    class task3 taskClass
+    classDef gatewayClass fill:#fef3c7,stroke:#f59e0b,stroke-width:2px
+    class gateway gatewayClass
+    classDef endClass fill:#fee2e2,stroke:#ef4444,stroke-width:2px
+    class end1 endClass

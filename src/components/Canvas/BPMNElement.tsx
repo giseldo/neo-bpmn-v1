@@ -1,5 +1,4 @@
 import React from 'react';
-import { Circle, Square, Diamond, CircleDot } from 'lucide-react';
 import { BPMNElement as BPMNElementType } from '../../types/bpmn';
 import { ConnectionHandle } from './ConnectionHandle';
 
@@ -30,13 +29,11 @@ export const BPMNElement: React.FC<BPMNElementProps> = ({
   const [dragStart, setDragStart] = React.useState({ x: 0, y: 0 });
   const [isEditing, setIsEditing] = React.useState(false);
   const [editValue, setEditValue] = React.useState(element.label);
-  const [hasMoved, setHasMoved] = React.useState(false);
 
   const getElementConfig = () => {
     switch (element.type) {
       case 'start':
         return {
-          Icon: Circle,
           color: 'text-green-600 border-green-600',
           bgColor: 'bg-green-50',
           size: 60,
@@ -44,7 +41,6 @@ export const BPMNElement: React.FC<BPMNElementProps> = ({
         };
       case 'task':
         return {
-          Icon: Square,
           color: 'text-blue-600 border-blue-600',
           bgColor: 'bg-blue-50',
           size: 100,
@@ -52,7 +48,6 @@ export const BPMNElement: React.FC<BPMNElementProps> = ({
         };
       case 'gateway':
         return {
-          Icon: Diamond,
           color: 'text-yellow-600 border-yellow-600',
           bgColor: 'bg-yellow-50',
           size: 80,
@@ -60,7 +55,6 @@ export const BPMNElement: React.FC<BPMNElementProps> = ({
         };
       case 'end':
         return {
-          Icon: CircleDot,
           color: 'text-red-600 border-red-600',
           bgColor: 'bg-red-50',
           size: 60,
@@ -70,7 +64,7 @@ export const BPMNElement: React.FC<BPMNElementProps> = ({
   };
 
   const config = getElementConfig();
-  const { Icon, color, bgColor, size, isRound } = config;
+  const { color, bgColor, size, isRound } = config;
 
   const handleDoubleClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -91,7 +85,6 @@ export const BPMNElement: React.FC<BPMNElementProps> = ({
     if (isEditing) return;
     
     e.preventDefault();
-    setHasMoved(false);
     setIsDragging(true);
     setDragStart({
       x: e.clientX - element.position.x,
@@ -102,7 +95,6 @@ export const BPMNElement: React.FC<BPMNElementProps> = ({
 
   const handleMouseMove = (e: MouseEvent) => {
     if (isDragging && !isConnecting && !isEditing) {
-      setHasMoved(true);
       const newPosition = {
         x: e.clientX - dragStart.x,
         y: e.clientY - dragStart.y,
@@ -113,7 +105,6 @@ export const BPMNElement: React.FC<BPMNElementProps> = ({
 
   const handleMouseUp = () => {
     setIsDragging(false);
-    setHasMoved(false);
   };
 
   const handleEditSubmit = () => {
@@ -190,10 +181,6 @@ export const BPMNElement: React.FC<BPMNElementProps> = ({
           ${element.type === 'gateway' ? 'transform rotate-45' : ''}
         `}
       >
-        <Icon 
-          size={element.type === 'task' ? 24 : 20} 
-          className={`${color} ${element.type === 'gateway' ? 'transform -rotate-45' : ''}`} 
-        />
       </div>
       
       {/* Label */}

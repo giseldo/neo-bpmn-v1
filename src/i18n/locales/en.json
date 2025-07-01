@@ -1,0 +1,82 @@
+{
+  "app": {
+    "title": "BPMN Designer",
+    "welcome": "Welcome to BPMN Designer",
+    "createFirstDiagram": "Create your first diagram to get started"
+  },
+  "sidebar": {
+    "myDiagrams": "My Diagrams",
+    "createDiagram": "Create Diagram",
+    "about": "About",
+    "help": "Help",
+    "language": "Language"
+  },
+  "toolbar": {
+    "elements": "Elements",
+    "startEvent": "Start Event",
+    "endEvent": "End Event",
+    "task": "Task",
+    "gateway": "Gateway",
+    "pool": "Pool",
+    "export": "Export",
+    "save": "Save",
+    "mermaid": "Mermaid",
+    "bpmn": "BPMN XML"
+  },
+  "canvas": {
+    "dropElements": "Drop elements here to create your diagram",
+    "unnamed": "Unnamed"
+  },
+  "chat": {
+    "title": "AI Assistant",
+    "placeholder": "Describe the changes you want to make to your diagram...",
+    "send": "Send",
+    "settings": "Settings",
+    "apiKey": "API Key",
+    "model": "Model",
+    "temperature": "Temperature",
+    "maxTokens": "Max Tokens",
+    "save": "Save Settings",
+    "cancel": "Cancel"
+  },
+  "dialogs": {
+    "createDiagram": {
+      "title": "Create New Diagram",
+      "name": "Diagram Name",
+      "create": "Create",
+      "cancel": "Cancel"
+    },
+    "renameDiagram": {
+      "title": "Rename Diagram",
+      "name": "New Name",
+      "rename": "Rename",
+      "cancel": "Cancel"
+    },
+    "deleteDiagram": {
+      "title": "Delete Diagram",
+      "message": "Are you sure you want to delete this diagram?",
+      "delete": "Delete",
+      "cancel": "Cancel"
+    }
+  },
+  "about": {
+    "title": "About BPMN Designer",
+    "description": "A modern, intuitive BPMN diagram editor with AI assistance.",
+    "version": "Version 1.0.0",
+    "close": "Close"
+  },
+  "help": {
+    "title": "Help",
+    "gettingStarted": "Getting Started",
+    "gettingStartedText": "1. Create a new diagram from the sidebar\n2. Drag and drop elements from the toolbar\n3. Connect elements by clicking and dragging\n4. Use the AI assistant to modify your diagram",
+    "elements": "BPMN Elements",
+    "elementsText": "• Start Event: Beginning of a process\n• End Event: End of a process\n• Task: A single activity\n• Gateway: Decision point in the process\n• Pool: Container for process participants",
+    "aiAssistant": "AI Assistant",
+    "aiAssistantText": "Use natural language to describe changes to your diagram. The AI will automatically modify your diagram based on your instructions.",
+    "close": "Close"
+  },
+  "languages": {
+    "en": "English",
+    "pt": "Português"
+  }
+}

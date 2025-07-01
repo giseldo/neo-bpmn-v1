@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Plus, FileText, Trash2, ChevronLeft, ChevronRight, Edit2, Check, X, Info, HelpCircle } from 'lucide-react';
 import { BPMNDiagram } from '../types/bpmn';
+import { LanguageSelector } from './LanguageSelector';
 
 interface SidebarProps {
   diagrams: BPMNDiagram[];
@@ -23,6 +25,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onShowAbout,
   onShowHelp,
 }) => {
+  const { t } = useTranslation();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [showNewDiagramInput, setShowNewDiagramInput] = useState(false);
   const [newDiagramName, setNewDiagramName] = useState('');
@@ -90,19 +93,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
     <div className="w-80 bg-gray-50 border-r border-gray-200 flex flex-col animate-slide-in">
       <div className="p-4 border-b border-gray-200">
         <div className="flex items-center justify-between">
-          <h1 className="text-xl font-semibold text-gray-900">BPMN Designer</h1>
+          <h1 className="text-xl font-semibold text-gray-900">{t('app.title')}</h1>
           <div className="flex items-center gap-1">
             <button
               onClick={onShowHelp}
               className="p-1 text-gray-500 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
-              title="Ajuda"
+              title={t('sidebar.help')}
             >
               <HelpCircle size={20} />
             </button>
             <button
               onClick={onShowAbout}
               className="p-1 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-              title="Sobre"
+              title={t('sidebar.about')}
             >
               <Info size={20} />
             </button>
@@ -114,6 +117,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </button>
           </div>
         </div>
+        
+        {/* Language Selector */}
+        <div className="mt-3">
+          <LanguageSelector />
+        </div>
       </div>
 
       <div className="p-4 border-b border-gray-200">
@@ -123,13 +131,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
             className="w-full flex items-center gap-2 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
           >
             <Plus size={20} />
-            New Diagram
+            {t('sidebar.createDiagram')}
           </button>
         ) : (
           <div className="space-y-2">
             <input
               type="text"
-              placeholder="Diagram name..."
+              placeholder={t('dialogs.createDiagram.name')}
               value={newDiagramName}
               onChange={(e) => setNewDiagramName(e.target.value)}
               onKeyDown={handleKeyPress}
@@ -141,7 +149,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 onClick={handleCreateDiagram}
                 className="flex-1 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
               >
-                Create
+                {t('dialogs.createDiagram.create')}
               </button>
               <button
                 onClick={() => {
@@ -150,7 +158,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 }}
                 className="flex-1 px-3 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors text-sm font-medium"
               >
-                Cancel
+                {t('dialogs.createDiagram.cancel')}
               </button>
             </div>
           </div>
@@ -212,7 +220,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                         {diagram.name}
                       </h3>
                       <p className="text-sm text-gray-500 mt-1">
-                        {diagram.elements.length} elements
+                        {diagram.elements.length} {t('toolbar.elements').toLowerCase()}
                       </p>
                       <p className="text-xs text-gray-400 mt-1">
                         {diagram.updatedAt.toLocaleDateString()}
@@ -227,7 +235,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   <button
                     onClick={(e) => startRename(diagram, e)}
                     className="p-1 text-gray-400 hover:text-blue-600 transition-colors"
-                    title="Rename diagram"
+                    title={t('dialogs.renameDiagram.rename')}
                   >
                     <Edit2 size={14} />
                   </button>
@@ -237,7 +245,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       onDeleteDiagram(diagram.id);
                     }}
                     className="p-1 text-gray-400 hover:text-red-600 transition-colors"
-                    title="Delete diagram"
+                    title={t('dialogs.deleteDiagram.delete')}
                   >
                     <Trash2 size={14} />
                   </button>
@@ -250,8 +258,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {diagrams.length === 0 && (
           <div className="text-center py-12">
             <FileText size={48} className="text-gray-300 mx-auto mb-4" />
-            <p className="text-gray-500 text-sm">No diagrams yet</p>
-            <p className="text-gray-400 text-xs mt-1">Create your first BPMN diagram</p>
+            <p className="text-gray-500 text-sm">{t('sidebar.myDiagrams')}</p>
+            <p className="text-gray-400 text-xs mt-1">{t('app.createFirstDiagram')}</p>
           </div>
         )}
       </div>

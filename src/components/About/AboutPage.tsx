@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { X, Mail, Github, Linkedin, Heart, Zap, Users, Shield } from 'lucide-react';
 
 interface AboutPageProps {
@@ -6,6 +7,8 @@ interface AboutPageProps {
 }
 
 export const AboutPage: React.FC<AboutPageProps> = ({ onClose }) => {
+  const { t } = useTranslation();
+  
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[70] p-4">
       <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
@@ -19,9 +22,9 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onClose }) => {
           </button>
           
           <div className="max-w-3xl">
-            <h1 className="text-4xl font-bold mb-4">BPMN Designer</h1>
+            <h1 className="text-4xl font-bold mb-4">{t('about.title')}</h1>
             <p className="text-xl text-blue-100 leading-relaxed">
-              Uma ferramenta moderna e intuitiva para criar diagramas BPMN com o poder da Inteligência Artificial
+              {t('about.description')}
             </p>
           </div>
         </div>
@@ -217,7 +220,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onClose }) => {
               onClick={onClose}
               className="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors text-lg"
             >
-              Começar Agora
+              {t('about.close')}
             </button>
           </section>
         </div>

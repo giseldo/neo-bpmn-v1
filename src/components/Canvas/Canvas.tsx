@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { BPMNDiagram, BPMNElement as BPMNElementType, BPMNConnection, BPMNPool, BPMNLane, DraggedElement } from '../../types/bpmn';
 import { BPMNElement } from './BPMNElement';
 import { ConnectionLine } from './ConnectionLine';
@@ -11,6 +12,7 @@ interface CanvasProps {
 }
 
 export const Canvas: React.FC<CanvasProps> = ({ diagram, onUpdateDiagram, draggedElement }) => {
+  const { t } = useTranslation();
   const [selectedElementId, setSelectedElementId] = useState<string | null>(null);
   const [selectedConnectionId, setSelectedConnectionId] = useState<string | null>(null);
   const [selectedPoolId, setSelectedPoolId] = useState<string | null>(null);
@@ -32,7 +34,7 @@ export const Canvas: React.FC<CanvasProps> = ({ diagram, onUpdateDiagram, dragge
     if (draggedElement.type === 'pool') {
       const newPool: BPMNPool = {
         id: crypto.randomUUID(),
-        name: `Pool ${diagram.pools.length + 1}`,
+        name: `${t('toolbar.pool')} ${diagram.pools.length + 1}`,
         position,
         size: { width: 400, height: 200 },
         color: '#3B82F6',

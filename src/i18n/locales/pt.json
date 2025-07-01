@@ -1,0 +1,82 @@
+{
+  "app": {
+    "title": "Designer BPMN",
+    "welcome": "Bem-vindo ao Designer BPMN",
+    "createFirstDiagram": "Crie seu primeiro diagrama para começar"
+  },
+  "sidebar": {
+    "myDiagrams": "Meus Diagramas",
+    "createDiagram": "Criar Diagrama",
+    "about": "Sobre",
+    "help": "Ajuda",
+    "language": "Idioma"
+  },
+  "toolbar": {
+    "elements": "Elementos",
+    "startEvent": "Evento Inicial",
+    "endEvent": "Evento Final",
+    "task": "Tarefa",
+    "gateway": "Gateway",
+    "pool": "Pool",
+    "export": "Exportar",
+    "save": "Salvar",
+    "mermaid": "Mermaid",
+    "bpmn": "BPMN XML"
+  },
+  "canvas": {
+    "dropElements": "Solte elementos aqui para criar seu diagrama",
+    "unnamed": "Sem nome"
+  },
+  "chat": {
+    "title": "Assistente IA",
+    "placeholder": "Descreva as mudanças que você quer fazer no seu diagrama...",
+    "send": "Enviar",
+    "settings": "Configurações",
+    "apiKey": "Chave da API",
+    "model": "Modelo",
+    "temperature": "Temperatura",
+    "maxTokens": "Máx. Tokens",
+    "save": "Salvar Configurações",
+    "cancel": "Cancelar"
+  },
+  "dialogs": {
+    "createDiagram": {
+      "title": "Criar Novo Diagrama",
+      "name": "Nome do Diagrama",
+      "create": "Criar",
+      "cancel": "Cancelar"
+    },
+    "renameDiagram": {
+      "title": "Renomear Diagrama",
+      "name": "Novo Nome",
+      "rename": "Renomear",
+      "cancel": "Cancelar"
+    },
+    "deleteDiagram": {
+      "title": "Excluir Diagrama",
+      "message": "Tem certeza de que deseja excluir este diagrama?",
+      "delete": "Excluir",
+      "cancel": "Cancelar"
+    }
+  },
+  "about": {
+    "title": "Sobre o Designer BPMN",
+    "description": "Um editor moderno e intuitivo de diagramas BPMN com assistência de IA.",
+    "version": "Versão 1.0.0",
+    "close": "Fechar"
+  },
+  "help": {
+    "title": "Ajuda",
+    "gettingStarted": "Primeiros Passos",
+    "gettingStartedText": "1. Crie um novo diagrama na barra lateral\n2. Arraste e solte elementos da barra de ferramentas\n3. Conecte elementos clicando e arrastando\n4. Use o assistente IA para modificar seu diagrama",
+    "elements": "Elementos BPMN",
+    "elementsText": "• Evento Inicial: Início de um processo\n• Evento Final: Fim de um processo\n• Tarefa: Uma única atividade\n• Gateway: Ponto de decisão no processo\n• Pool: Container para participantes do processo",
+    "aiAssistant": "Assistente IA",
+    "aiAssistantText": "Use linguagem natural para descrever mudanças no seu diagrama. A IA modificará automaticamente seu diagrama baseado nas suas instruções.",
+    "close": "Fechar"
+  },
+  "languages": {
+    "en": "English",
+    "pt": "Português"
+  }
+}

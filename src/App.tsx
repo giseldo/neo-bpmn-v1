@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Sidebar } from './components/Sidebar';
 import { Toolbar } from './components/Toolbar';
 import { Canvas } from './components/Canvas/Canvas';
@@ -12,6 +13,7 @@ import { exportToMermaid, exportToBPMN } from './utils/exporters';
 import { applyModifications } from './utils/diagramModifier';
 
 function App() {
+  const { t } = useTranslation();
   const {
     diagrams,
     currentDiagram,
@@ -100,9 +102,9 @@ function App() {
   // Create a default diagram if none exist
   React.useEffect(() => {
     if (diagrams.length === 0) {
-      createDiagram('My First Diagram');
+      createDiagram(t('sidebar.myDiagrams'));
     }
-  }, [diagrams.length]);
+  }, [diagrams.length, createDiagram, t]);
 
   return (
     <div className="h-screen flex bg-white font-sans">
@@ -134,10 +136,10 @@ function App() {
           <div className="flex-1 flex items-center justify-center bg-gray-50">
             <div className="text-center">
               <h2 className="text-2xl font-semibold text-gray-900 mb-2">
-                Welcome to BPMN Designer
+                {t('app.welcome')}
               </h2>
               <p className="text-gray-600">
-                Create your first diagram to get started
+                {t('app.createFirstDiagram')}
               </p>
             </div>
           </div>
